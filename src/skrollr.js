@@ -254,6 +254,11 @@
 			keyframe: options.keyframe
 		};
 
+		//Check for elements with the following ids and exclude them
+	  //from Skrollr scrolling. Useful on mobile when there are
+	  //multiple scrolling areas
+	  _excludeElementsWithSelector = options.excludeElementsWithSelector;
+
 		//forceHeight is true by default
 		_forceHeight = options.forceHeight !== false;
 
@@ -688,6 +693,7 @@
 		_isMobile = false;
 		_mobileOffset = 0;
 		_translateZ = undefined;
+		_excludeElementsWithSelector = undefined;
 	};
 
 	/*
@@ -713,6 +719,16 @@
 			var touch = e.changedTouches[0];
 
 			currentElement = e.target;
+
+			//Check that the current element is not in the exceptions list
+			//Don't scroll if it is, let the native scrolling take over
+			if (_excludeElementsWithSelector !== undefined) {
+				for (var i = 0; i < _excludeElementsWithSelector.length; i++) {
+					if (currentElement.className == _excludeElementsWithSelector[i]) {
+					  return;
+					}
+				}
+			}
 
 			//We don't want text nodes.
 			while(currentElement.nodeType === 3) {
@@ -1753,6 +1769,8 @@
 
 	//Will contain data about registered events by skrollr.
 	var _registeredEvents = [];
+
+	var _excludeElementsWithSelector = [];
 
 	//Animation frame id returned by RequestAnimationFrame (or timeout when RAF is not supported).
 	var _animFrame;
